@@ -7,6 +7,9 @@ track_users:
 track_by_external_id:
   default: false
   description: "For sites with SSO enabled, track users by their external_id instead of by their Discourse id"
+track_by_email:
+  default: false
+  description: "Track users by their email address instead of by their Discourse id or external_id"
 include_user_email:
   default: false
   description: "Include user's email address in identify payload"
