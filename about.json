@@ -3,6 +3,6 @@
   "component": true,
   "license": "MIT",
   "about_url": "https://github.com/islegendary/discourse-segment-theme-component",
-  "authors": ["@islegendary", "scossar"],
+  "authors": ["@islegendary", "@scossar"],
   "minimum_discourse_version": "2.4.0"
 }
