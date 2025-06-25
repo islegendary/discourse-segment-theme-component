@@ -9,7 +9,7 @@ user_id_strategy:
     - anonymous_id
     - discourse_id
   default: email
-  description: "*If anonymous_id is selected, no user_id will be sent which will allow merge on email address. All other options include anonymous_id + user_id. Tip: To carry your anonymous_id from your main site, use the Segmemt Querystring API."
+  description: "*If anonymous_id is selected, no user_id will be sent which will allow merge on email address. All other options include anonymous_id + user_id. Tip: To carry your anonymous_id from your main site, use the Segment Querystring API."
 include_user_email:
   default: false
   description: "Include user's email address in identify payload"
