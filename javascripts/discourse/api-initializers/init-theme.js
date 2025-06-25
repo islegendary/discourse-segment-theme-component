@@ -75,8 +75,6 @@ export default apiInitializer((api) => {
       case 'anonymous_id':
         // Generate a deterministic anonymous ID based on user ID
         userID = null;
-        const anonymousId = `${user.id}-dc-${btoa(user.username).substring(0, 8)}`;
-        analytics.setAnonymousId(anonymousId);
         break;
       case 'discourse_id':
       default:
