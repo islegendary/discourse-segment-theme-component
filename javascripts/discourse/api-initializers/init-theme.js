@@ -61,18 +61,31 @@ export default apiInitializer((api) => {
   function identifyUser(user) {
     if (hasIdentified || !user) return;
     
-    if (settings.track_by_email) {
-      userID = user.email;
-    } else if (ssoEnabled && settings.track_by_external_id) {
-      userID = user.external_id;
-    } else {
-      userID = user.id;
+    switch (settings.user_id_strategy) {
+      case 'email':
+        userID = user.email;
+        break;
+      case 'external_id':
+        userID = ssoEnabled ? user.external_id : user.id;
+        break;
+      case 'anonymous_id':
+        // Generate a deterministic anonymous ID based on user ID
+        userID = null;
+        const anonymousId = `${user.id}-dc-${btoa(user.username).substring(0, 8)}`;
+        analytics.setAnonymousId(anonymousId);
+        break;
+      case 'discourse_id':
+      default:
+        userID = user.id;
+        break;
     }
     
-    if (settings.include_user_email) {
-      analytics.identify(userID, {email: user.email});
-    } else {
-      analytics.identify(userID);
+    if (settings.user_id_strategy !== 'anonymous_id') {
+      if (settings.include_user_email) {
+        analytics.identify(userID, {email: user.email});
+      } else {
+        analytics.identify(userID);
+      }
     }
     
     hasIdentified = true;
@@ -85,8 +98,9 @@ export default apiInitializer((api) => {
     window.analytics.page(currentPage, opts);
   }
 
-  // Optimized event tracking function with consistent properties
+  // Optimized event tracking function with consistent properties and email context
   function track(eventName, properties = {}) {
+    const currentUser = api.getCurrentUser();
     const baseProperties = {
       platform,
       location: currentPage,
@@ -94,7 +108,16 @@ export default apiInitializer((api) => {
       discourse_user_id: userID
     };
     
-    window.analytics.track(eventName, { ...baseProperties, ...properties });
+    // Add email to context.traits for better merging when available
+    const context = {
+      traits: {}
+    };
+    
+    if (currentUser && currentUser.email) {
+      context.traits.email = currentUser.email;
+    }
+    
+    window.analytics.track(eventName, { ...baseProperties, ...properties }, context);
   }
 
   // Enhanced page change handler with better naming

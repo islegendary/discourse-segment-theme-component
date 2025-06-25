@@ -1,18 +1,21 @@
 segment_write_key:
   default: ""
   description: "The Write Key for your Segment Source"
-track_users:
-  default: true
-  description: "Call the Segment identify function when a user logs in or refreshes the site"
-track_by_external_id:
-  default: false
-  description: "For sites with SSO enabled, track users by their external_id instead of by their Discourse id"
-track_by_email:
-  default: false
-  description: "Track users by their email address instead of by their Discourse id or external_id"
+user_id_strategy:
+  type: enum
+  choices:
+    - email
+    - external_id
+    - anonymous_id
+    - discourse_id
+  default: email
+  description: "How to identify users in Segment. Tip: To carry your anonymousId from your site, use the Querystring API https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/querystring/"
 include_user_email:
   default: false
   description: "Include user's email address in identify payload"
+track_users:
+  default: true
+  description: "Call the Segment identify function when a user logs in"
 track_page:
   default: false
   description: "Track page visits by page type (tracks the latest, categories, category, tags, and topic pages)"
