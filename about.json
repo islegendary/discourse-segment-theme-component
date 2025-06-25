@@ -1,10 +1,8 @@
 {
   "name": "discourse-segment-theme-component",
-  "about_url": "https://github.com/scossar/discourse-segment-theme-component",
-  "license_url": "https://github.com/scossar/discourse-segment-theme-component/blob/master/LICENSE",
   "component": true,
-  "assets": {
-  },
-  "color_schemes": {
-  }
+  "license": "MIT",
+  "about_url": "https://github.com/islegendary/discourse-segment-theme-component",
+  "authors": ["@islegendary"],
+  "minimum_discourse_version": "2.7.0"
 }
