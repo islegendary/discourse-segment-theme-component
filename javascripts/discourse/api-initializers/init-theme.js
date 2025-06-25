@@ -78,26 +78,32 @@ export default apiInitializer((api) => {
     hasIdentified = true;
   }
 
-  // Optimized page tracking function
+  // Optimized page tracking function with better naming
   function page(title, opts = {}) {
     opts.platform = platform;
     currentPage = title;
     window.analytics.page(currentPage, opts);
   }
 
-  // Optimized event tracking function
-  function track(title, opts = {}) {
-    opts.platform = platform;
-    opts.location = currentPage;
-    window.analytics.track(title, opts);
+  // Optimized event tracking function with consistent properties
+  function track(eventName, properties = {}) {
+    const baseProperties = {
+      platform,
+      location: currentPage,
+      timestamp: new Date().toISOString(),
+      discourse_user_id: userID
+    };
+    
+    window.analytics.track(eventName, { ...baseProperties, ...properties });
   }
 
-  // Optimized page change handler
+  // Enhanced page change handler with better naming
   function pageChanged(container, details) {
     const routeName = details.currentRouteName;
     const route = container.lookup(`route:${routeName}`);
     const model = route?.currentModel;
     let pageTitle = null;
+    let pageProperties = {};
 
     switch (routeName) {
       case "discovery.latest":
@@ -110,28 +116,46 @@ export default apiInitializer((api) => {
       case "discovery.category":
         if (model?.category) {
           pageTitle = `Category: ${model.category.name}`;
+          pageProperties = {
+            category_id: model.category.id,
+            category_name: model.category.name,
+            category_slug: model.category.slug
+          };
         }
         break;
       case "tags.show":
         if (model?.id) {
           pageTitle = `Tag: ${model.id}`;
+          pageProperties = { tag_name: model.id };
         }
         break;
       case "tags.showCategory":
         if (model?.id) {
           pageTitle = `Category Tag: ${model.id}`;
+          pageProperties = { tag_name: model.id };
         }
         break;
       case "topic.fromParams":
       case "topic.fromParamsNear":
         if (details.title) {
-          pageTitle = `Topic: ${details.title}`;
+          pageTitle = `Topic View`;
+          pageProperties = {
+            topic_title: details.title,
+            topic_id: details.topicId
+          };
         }
+        break;
+      case "user":
+        pageTitle = "User Profile";
+        pageProperties = { username: model?.username };
+        break;
+      case "admin":
+        pageTitle = "Admin Dashboard";
         break;
     }
 
     if (pageTitle) {
-      page(pageTitle, {referrer: currentUrl});
+      page(pageTitle, { referrer: currentUrl, ...pageProperties });
       currentUrl = window.location.href;
     }
   }
@@ -142,6 +166,20 @@ export default apiInitializer((api) => {
     if (currentUser && !hasIdentified) {
       api.container.lookup('store:main').find('user', currentUser.username).then(identifyUser);
     }
+  }
+
+  // Track user sign up (new user registration)
+  if (settings.track_users) {
+    api.onAppEvent("user:created", (user) => {
+      if (user) {
+        track("Signed Up", {
+          user_id: user.id,
+          username: user.username,
+          email: user.email,
+          created_at: user.created_at
+        });
+      }
+    });
   }
 
   // Event listeners with optimized conditions
@@ -159,6 +197,8 @@ export default apiInitializer((api) => {
           topic_title: post.title,
           category_id: composerModel?.get("category.id"),
           category_name: composerModel?.get("category.name"),
+          category_slug: composerModel?.get("category.slug"),
+          tags: composerModel?.get("tags") || []
         });
       }
     });
@@ -169,10 +209,13 @@ export default apiInitializer((api) => {
       if (post) {
         track("Post Created", {
           post_id: post.id,
+          post_number: post.post_number,
           topic_id: post.get("topic.id"),
           topic_title: post.get("topic.title"),
           category_id: post.get("topic.category.id"),
           category_name: post.get("topic.category.name"),
+          category_slug: post.get("topic.category.slug"),
+          is_first_post: post.post_number === 1
         });
       }
     });
@@ -182,12 +225,15 @@ export default apiInitializer((api) => {
     api.onAppEvent("page:like-toggled", (post, likeAction) => {
       const topic = post?.topic;
       if (post && topic && likeAction?.acted) {
-        track("Like", {
+        track("Post Liked", {
+          post_id: post.id,
+          post_number: post.post_number,
           topic_id: topic.id,
           topic_title: topic.title,
           category_id: topic.get("category.id"),
           category_name: topic.get("category.name"),
-          post_id: post.id
+          category_slug: topic.get("category.slug"),
+          is_first_post: post.post_number === 1
         });
       }
     });
@@ -200,11 +246,14 @@ export default apiInitializer((api) => {
         track(
           post.post_number === 1 ? "Topic Bookmarked" : "Post Bookmarked",
           {
+            post_id: post.post_number === 1 ? null : post.id,
+            post_number: post.post_number,
             topic_id: topic.id,
             topic_title: topic.title,
             category_id: topic.get("category.id"),
             category_name: topic.get("category.name"),
-            post_id: post.post_number === 1 ? null : post.id
+            category_slug: topic.get("category.slug"),
+            is_first_post: post.post_number === 1
           }
         );
       }
@@ -214,23 +263,44 @@ export default apiInitializer((api) => {
   if (settings.track_flags) {
     api.onAppEvent("post:flag-created", (post, postAction) => {
       if (post && postAction) {
-        track("Flag", {
+        track("Post Flagged", {
           post_id: post.id,
+          post_number: post.post_number,
           topic_id: post.topic_id,
           topic_title: post.get("topic.title"),
-          flag_option: postAction.get("actionType.name")
+          flag_type: postAction.get("actionType.name"),
+          flag_reason: postAction.get("message")
         });
       }
     });
 
     api.onAppEvent("topic:flag-created", (post, postAction) => {
       if (post && postAction) {
-        track("Flag", {
-          post_id: post.topic_id,
+        track("Topic Flagged", {
+          topic_id: post.topic_id,
           topic_title: post.get("topic.title"),
           category_id: post.get("topic.category.id"),
           category_name: post.get("topic.category.name"),
-          flag_option: postAction.get("actionType.name")
+          category_slug: post.get("topic.category.slug"),
+          flag_type: postAction.get("actionType.name"),
+          flag_reason: postAction.get("message")
+        });
+      }
+    });
+  }
+
+  // Track topic tag creation (new event)
+  if (settings.track_topic_creation) {
+    api.onAppEvent("topic:tag-changed", (topic, tags) => {
+      if (topic && tags && tags.length > 0) {
+        track("Topic Tag Created", {
+          topic_id: topic.id,
+          topic_title: topic.title,
+          category_id: topic.get("category.id"),
+          category_name: topic.get("category.name"),
+          category_slug: topic.get("category.slug"),
+          tags: tags,
+          tag_count: tags.length
         });
       }
     });
