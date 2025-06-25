@@ -93,11 +93,27 @@ export default apiInitializer((api) => {
     hasIdentified = true;
   }
 
-  // Optimized page tracking function with better naming
+  // Optimized page tracking function with better naming and context
   function page(title, opts = {}) {
+    const currentUser = api.getCurrentUser();
     opts.platform = platform;
     currentPage = title;
-    window.analytics.page(currentPage, opts);
+    
+    // Add email and username to context.traits for better merging when available
+    const context = {
+      traits: {}
+    };
+    
+    if (currentUser) {
+      if (normalizedEmail) {
+        context.traits.email = normalizedEmail;
+      }
+      if (currentUser.username) {
+        context.traits.discourse_username = currentUser.username;
+      }
+    }
+    
+    window.analytics.page(currentPage, opts, context);
   }
 
   // Optimized event tracking function with consistent properties and email context
