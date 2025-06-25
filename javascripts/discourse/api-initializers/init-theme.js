@@ -108,9 +108,13 @@ export default apiInitializer((api) => {
     const baseProperties = {
       platform,
       location: currentPage,
-      timestamp: new Date().toISOString(),
-      discourse_user_id: userID
+      timestamp: new Date().toISOString()
     };
+    
+    // Only include discourse_user_id if we have a valid userID (not anonymous mode)
+    if (userID) {
+      baseProperties.discourse_user_id = userID;
+    }
     
     // Add email and username to context.traits for better merging when available
     const context = {
