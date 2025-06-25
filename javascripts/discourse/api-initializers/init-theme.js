@@ -138,7 +138,7 @@ export default apiInitializer((api) => {
       case "topic.fromParams":
       case "topic.fromParamsNear":
         if (details.title) {
-          pageTitle = `Topic View`;
+          pageTitle = `Topic Viewed`;
           pageProperties = {
             topic_title: details.title,
             topic_id: details.topicId
