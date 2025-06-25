@@ -46,6 +46,7 @@ export default apiInitializer((api) => {
   const ua = navigator.userAgent;
   let platform = "Web";
   let userID = null;
+  let normalizedEmail = null;
   let hasIdentified = false;
   let currentUrl = window.location.href;
   let currentPage = null;
@@ -61,9 +62,12 @@ export default apiInitializer((api) => {
   function identifyUser(user) {
     if (hasIdentified || !user) return;
     
+    // Normalize email once for consistent use
+    normalizedEmail = user.email ? user.email.toLowerCase().trim() : null;
+    
     switch (settings.user_id_strategy) {
       case 'email':
-        userID = user.email;
+        userID = normalizedEmail;
         break;
       case 'external_id':
         userID = ssoEnabled ? user.external_id : user.id;
@@ -81,8 +85,8 @@ export default apiInitializer((api) => {
     }
     
     if (settings.user_id_strategy !== 'anonymous_id') {
-      if (settings.include_user_email) {
-        analytics.identify(userID, {email: user.email});
+      if (settings.include_user_email && normalizedEmail) {
+        analytics.identify(userID, {email: normalizedEmail});
       } else {
         analytics.identify(userID);
       }
@@ -108,13 +112,18 @@ export default apiInitializer((api) => {
       discourse_user_id: userID
     };
     
-    // Add email to context.traits for better merging when available
+    // Add email and username to context.traits for better merging when available
     const context = {
       traits: {}
     };
     
-    if (currentUser && currentUser.email) {
-      context.traits.email = currentUser.email;
+    if (currentUser) {
+      if (normalizedEmail) {
+        context.traits.email = normalizedEmail;
+      }
+      if (currentUser.username) {
+        context.traits.discourse_username = currentUser.username;
+      }
     }
     
     window.analytics.track(eventName, { ...baseProperties, ...properties }, context);

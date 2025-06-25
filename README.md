@@ -83,6 +83,7 @@ All events include consistent base properties for device mode tracking:
 - `discourse_user_id` - Current user ID
 - `location` - Current page context
 - `context.traits.email` - User email (when available) for better merging
+- `context.traits.discourse_username` - Discourse username (when available) for better merging
 
 Additional properties vary by event type and include relevant IDs, names, slugs, and metadata.
 
