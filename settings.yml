@@ -33,4 +33,4 @@ track_bookmarks:
   description: "Track bookmarks"
 extend_content_security_policy:
   type: list
-  default: "script_src: https://cdn.segment.com/analytics.js/"
+  default: "script_src: https://cdn.segment.com/analytics.js"
