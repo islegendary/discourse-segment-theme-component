@@ -7,6 +7,14 @@ site to Segment.
 
 See [How do I install a Theme or Theme Component?](https://meta.discourse.org/t/how-do-i-install-a-theme-or-theme-component/63682)
 
+### Modern Discourse Theme JS
+
+**As of 2025, all JavaScript for this theme component is located in:**
+```
+javascripts/discourse/api-initializers/init-theme.js
+```
+This follows the [latest Discourse theme best practices](https://meta.discourse.org/t/modernizing-inline-script-tags-for-templates-js-api/366482). The old `<script type='text/discourse-plugin'>` block is no longer used and has been removed.
+
 ### Configuration
 
 1. Go to **Admin > Customize > Themes > [Your Theme] > Components > discourse-segment-theme-component > Settings**.
