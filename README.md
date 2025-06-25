@@ -46,9 +46,9 @@ Choose how users are identified in Segment:
 
 **Note:** The `external_id` option requires SSO to be enabled. If SSO is disabled, it will fall back to `discourse_id`.
 
-**Anonymous ID:** Uses a deterministic anonymous ID format (`{discourse_id}-dc-{encoded_username}`) that remains consistent across sessions without requiring personal information. Perfect for privacy-conscious implementations while maintaining user journey tracking.
+**Anonymous ID:** Uses the anonymous_id only allowing you to merge by email which is now included in context.traits.email.
 
-**Tip:** To carry your anonymousId from your site, use the [Querystring API](https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/querystring/).
+**Tip:** To carry your anonymous_id from your site, use the [Querystring API](https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/querystring/).
 
 ### Tracked Events
 
@@ -80,7 +80,7 @@ Choose how users are identified in Segment:
 All events include consistent base properties for device mode tracking:
 - `platform` - Device platform (Web, iOS, Android)
 - `timestamp` - ISO timestamp of the event
-- `discourse_user_id` - Current user ID
+- `discourse_user_id` - Current user ID if used
 - `location` - Current page context
 - `context.traits.email` - User email (when available) for better merging
 - `context.traits.discourse_username` - Discourse username (when available) for better merging
