@@ -111,7 +111,6 @@ The Segment analytics.js snippet is dynamically loaded using your configured wri
 - Make changes to your settings as needed.
 - The component supports calling `segment.identify` when a user first logs on to the site.
 - Tracks comprehensive user engagement across all major Discourse activities.
-- Provides detailed analytics for content creation, engagement, and user behavior.
 
 ---
 
