@@ -39,7 +39,7 @@ Choose how users are identified in Segment:
 
 | Option | Description | Use Case |
 |--------|-------------|----------|
-| `email` | User's email address | Most common, works with most tools |
+| `email` | User's email address | Works across sources |
 | `external_id` | SSO external ID | When using SSO and want consistent IDs |
 | `anonymous_id` | Use anonymous ID only | Preserves User ID avoiding mismatch |
 | `discourse_id` | Internal Discourse ID | Simple numeric IDs, least privacy-friendly |
