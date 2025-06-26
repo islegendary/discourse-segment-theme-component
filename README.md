@@ -41,14 +41,14 @@ Choose how users are identified in Segment:
 |--------|-------------|----------|
 | `email` | User's email address | Most common, works with most tools |
 | `external_id` | SSO external ID | When using SSO and want consistent IDs |
-| `anonymous_id` | Use anonymous ID only | Privacy-focused, cross-session tracking |
+| `anonymous_id` | Use anonymous ID only | Preserves User ID Mismatch |
 | `discourse_id` | Internal Discourse ID | Simple numeric IDs, least privacy-friendly |
 
-**Note:** The `external_id` option requires SSO to be enabled. If SSO is disabled, it will fall back to `discourse_id`.
+**Note:** The `external_id` option requires SSO to be enabled. 
 
-**Anonymous ID:** Uses the anonymous_id only allowing you to merge by email which is now included in context.traits.email.
+**Anonymous ID:** Uses the anonymous_id only allowing you to merge on email which is now included in context.traits.email.
 
-**Tip:** To carry your anonymous_id from your site, use the [Querystring API](https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/querystring/).
+**Tip:** To carry your anonymous_id from your site, use the Segment [Querystring API](https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/querystring/).
 
 ### Tracked Events
 
